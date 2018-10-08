@@ -5,6 +5,8 @@ from sklearn import model_selection
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
+
+#algorithms from sklearn
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
@@ -75,7 +77,70 @@ scoring = 'accuracy'
 #we are using the metric of accuracy to evaluate models: ratio of (# of correctly predicted instances/ total # of instances in dataset) * 100
 #gives a percentage, e.g. 95% accurate
 
-#6 different algorithms to evaluate
-#Logistic Regression:
+#6 different algorithms to evaluate:
 
-#testing #2
+#Logistic Regression: uses logistic function to model a binary variable: pass/fail, win/lose, 0,1
+
+#Linear Discriminant Analysis (LDA): method used to find a linear combination of features that characterizes 
+#or separates two or more classes of objects or events. LDA explicitly attempts to model the difference between the classes of data.
+#Discriminant function analysis is classification - the act of distributing things into groups, classes, etc
+
+#K-Nearest Neighbors: non parametric method used for classification & regression. Output is a class membership
+#classified by the majority vote of it's neighbors, with the object being assigned to the class most common 
+#amongst its k nearest neighbors. Simplest of ML algorithms
+
+#Classification & Regression trees (CART): trees used to go from observations of an item to conclusion about an
+#item's target value
+#tree models where target variable can take a discrete set of values -> classification trees
+
+#Gaussian Naive bayes: Bayes theorem, extended real-valued attributes
+
+#Support Vector Machines (SVM): supervised learning models with associated learning algorithms that analyze 
+# data used for classification & regression analysis
+# given set of training examples, each marked as belonging to one or the other of two categories it builds a 
+# model that assigns new examples to one category or another
+
+
+#spot check algorithms
+models = []
+models.append(('LR',LogisticRegression()))
+models.append(('LDA',LogisticRegression()))
+models.append(('KNN', KNeighborsClassifier()))
+models.append(('CART',DecisionTreeClassifier()))
+models.append(('NB',GaussianNB()))
+models.append(('SVM',SVC()))
+
+#evaluate each model in turn
+
+results = []
+names = []
+for name, model in models:
+    kfold = model_selection.KFold(n_splits=10, random_state=seed)
+    cv_results = model_selection.cross_val_score(model, X_train,Y_train, cv=kfold, scoring=scoring)
+    results.append(cv_results)
+    names.append(name)
+    msg = "%s: %f (%f) " % (name, cv_results.mean(),cv_results.std())
+    print(msg)
+#from this, we see KNN has the largest estimated accuracy score
+#
+# Compare Algorithms
+#  
+fig = plt.figure()
+fig.suptitle("Algorithm Comparison")
+ax = fig.add_subplot(111)
+plt.boxplot(results)
+ax.set_xticklabels(names)
+plt.show()
+
+#KNN most accurate model tested
+#now to get an idea of accuracy of model on validation set
+
+#make predictions on validation dataset
+knn = KNeighborsClassifier()
+knn.fit(X_train,Y_train)
+predictions = knn.predict(X_validation)
+
+print(accuracy_score(Y_validation,predictions))
+print(confusion_matrix(Y_validation,predictions))
+print(classification_report(Y_validation,predictions))
+
