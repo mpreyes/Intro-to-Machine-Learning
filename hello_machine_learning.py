@@ -78,4 +78,4 @@ scoring = 'accuracy'
 #6 different algorithms to evaluate
 #Logistic Regression:
 
-#testing
+#testing #2
